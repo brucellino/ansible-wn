@@ -1,0 +1,4 @@
+name: Install WN package
+  package:
+    name: wn
+    state: latest
