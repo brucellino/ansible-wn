@@ -2,3 +2,9 @@
   package:
     name: wn
     state: latest
+
+- name: Install glexec package
+  package:
+    name: glexec-wn
+    state: latest
+  when: deploy_glexec
