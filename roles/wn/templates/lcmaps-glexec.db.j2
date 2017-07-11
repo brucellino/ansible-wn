@@ -1,0 +1,295 @@
+## LCMAPS policy file/plugin definition for gLExec
+##
+## This file defines the plug-in configurations and policy
+## definitions as used by gLExec. 
+##
+## As it is impossible to provide a default
+## configuration that a) makes sense and b) doesn't require
+## at least one plug-in that is not strictly required in every case,
+## all configurations are commented out. The system administrator
+## should pick and choose which parts are needed. The selected plug-ins
+## are provided in separate packages.
+##
+## For more information, see lcmaps.db(5) and the documentation for
+## each individual plugin, or go to 
+## http://www.nikhef.nl/pub/projects/grid/gridwiki/index.php/Site_Access_Control
+##
+## The default path where modules are looked for. Do not change this.
+
+path = /usr/lib64/lcmaps
+
+##
+## ======================================================================
+## Section: PLUG-INS
+## ======================================================================
+##
+## The first section lists each plug-in by alias, name and parameters.
+## Only the plug-ins that are used will actually be loaded.
+##
+## 
+## Dummy plug-in
+## 
+## The dummy plug-in always returns good or bad. Mostly usefol for terminating
+## a policy rule.
+
+# good             = "lcmaps_dummy_good.mod"
+# bad              = "lcmaps_dummy_bad.mod"
+
+## 
+## Local account plug-in
+## 
+## The localaccount plug-in looks up the user's DN in a static table
+## called the grid-mapfile. If found, the user account is returned as
+## the mapping.
+##
+
+# localaccount     = "lcmaps_localaccount.mod"
+#                        "-gridmapfile /etc/grid-security/grid-mapfile"
+
+## 
+## Pool account plug-in
+## 
+## The poolaccount plug-in enhances the localaccount plug-in by matching
+## the user DN with a class of users called a pool. All users in a pool
+## have the same prefix, and a numerical suffix, e.g. ops001, ops002, ...
+## The entry in the grid-mapdir should be the prefix with a period in front,
+## thus for the above example it should be '.ops'; the actual account to
+## map is taken from the gridmapdir by claiming an available slot in the pool.
+
+# poolaccount      = "lcmaps_poolaccount.mod"
+#                        "-gridmapfile /etc/grid-security/grid-mapfile"
+#                        "-gridmapdir /etc/grid-security/gridmapdir"
+#                        "-override_inconsistency" 
+
+## 
+## DN-based banning plug-in
+## 
+## The ban_dn plug-in looks up the user's DN in a static table called
+## the ban-mapfile. If found, the user will be banned (i.e. plugin will fail).
+## The format is the same as used for the grid-mapfile and the old LCAS
+## ban_users.db
+##
+
+# ban_dn           = "lcmaps_ban_dn.mod"
+#                        "-banmapfile /etc/grid-security/ban-mapfile"
+
+## 
+## Posix enforcement plug-in
+## 
+## The posix_enf plug-in takes the mapping as returned by earlier
+## plug-ins and changes the user's identity according to the mapping,
+## including any mapped secondary group ids. This is usually the last
+## step in the chain.
+
+# posix_enf        = "lcmaps_posix_enf.mod"
+#                        "-maxuid 1"
+#                        "-maxpgid 1"
+#                        "-maxsgid 32"
+
+##
+## Tracking group plug-in
+##
+## The Tracking Group ID plug-in can reattach secondary Group IDs from
+## the calling user to the mapped user account. This is to ensure that
+## special tracking group IDs, attached by the batch system to a running
+## job, also remain when e.g. gLExec is switching the Unix/POSIX process
+## ownership.
+## The tracking group plug-in can either preserve a fixed range of Unix
+## Group IDs or can auto-discover tracking GIDs. The auto-discover works
+## by assuming tracking GIDs are 'nameless', but should be used with
+## care.
+
+# tracking_groupid = "lcmaps_tracking_groupid.mod"
+#                        "--tracking-groupid-min MINGID"
+#                        "--tracking-groupid-max MAXGID"
+
+##
+## verify-proxy
+##
+## The lcmaps_verify_proxy plugin verifies the validity of a proxy chain
+## and (optionally) a valid delegation, including restrictions on the
+## life time of any proxies in the chain. 
+## For more informaation about this plugin: 
+##    http://www.nikhef.nl/pub/projects/grid/gridwiki/index.php/Verify-proxy
+
+verify_proxy    = "lcmaps_verify_proxy.mod" 
+                      " -certdir /etc/grid-security/certificates/"
+                      " --allow-limited-proxy"
+
+## 
+## VOMS local account mapping
+##
+## The voms_localaccount plugin will map the VOMS FQANs (Fully Qualified
+## Attribute Names) to a local account using a static table
+## called the grid-mapfile.
+
+# vomslocalaccount = "lcmaps_voms_localaccount.mod"
+#                        "-gridmapfile /etc/grid-security/grid-mapfile"
+
+## 
+## VOMS local group mapping
+## 
+## The voms_localgroup plugin will map the VOMS FQANs (Fully Qualified
+## Attribute Names) to one or more locally known groups by matching each
+## FQAN to a line in the groupmapfile.
+
+# vomslocalgroup   = "lcmaps_voms_localgroup.mod"
+#                        "-groupmapfile /etc/grid-security/groupmapfile"
+#                        "-mapmin 0"
+
+## 
+## VOMS pool group mapping
+## 
+## In special cases, sets FQANs may be mapped to a class of groups, for 
+## instance by using wildcards (? Is this nonsense or what?).
+## This plug-in is rarely needed.
+
+# vomspoolgroup    = "lcmaps_voms_poolgroup.mod"
+#                        "-groupmapfile /etc/grid-security/groupmapfile"
+#                        "-groupmapdir /etc/grid-security/groupmapdir"
+#                        "-override_inconsistency" 
+#                        "-mapmin 0"
+
+## 
+## VOMS pool account mapping
+## 
+## The voms_poolaccount plug-in maps FQANs to pool users, just like
+## the plain poolaccount plug-in maps DNs.
+
+# vomspoolaccount  = "lcmaps_voms_poolaccount.mod"
+#                        "-gridmapfile /etc/grid-security/grid-mapfile"
+#                        "-gridmapdir /etc/grid-security/gridmapdir"
+
+## 
+## FQAN-based banning plug-in
+## 
+## The ban_fqan plug-in looks up the user's VOMS FQANs in a static table called
+## the ban-mapfile. If found, the user will be banned (i.e. plugin will fail).
+## The format is the same as used for the grid-mapfile and the old LCAS
+## ban_users.db
+##
+
+# ban_fqan           = "lcmaps_ban_fqan.mod"
+#                        "-banmapfile /etc/grid-security/ban-mapfile"
+
+## 
+## The LDAP enforcement plug-in
+## 
+## The LDAP enforcement plug-in will update an LDAP directory after
+## a successful mapping. Some systems require this as the mapped user
+## needs certain tokens from the directory later on. As the update
+## requires administrator privileges, the password is required. It
+## should be stored in a file that ordinary users cannot read.
+
+# ldap_enf         = "lcmaps_ldap_enf.mod"
+#                        "-maxuid  1"
+#                        "-maxpgid 1"
+#                        "-maxsgid 32"
+#                        "-hostname ldap.example.org"
+#                        "-port 389"
+#                        "-require_all_groups yes"
+#                        "-dn_manager \"cn=Manager,dc=root\""
+#                        "-ldap_pw /opt/edg/etc/lcmaps/test_pw"
+#                        "-sb_groups \"ou=LocalGroups,dc=example,dc=org\""
+#                        "-sb_user \"ou=LocalUsers,dc=example,dc=org\""
+#                        "-timeout 5"
+
+##
+## The SCAS client plug-in
+##
+## The LCMAPS plug-in SCAS Client utilizes the SAML2-XACML2 protocol to
+## contact the SCAS daemon. It will send the user credentials, (if
+## applicable) the pilot job credentials and extra information to the
+## SCAS service.
+## 
+## The SCAS service will process the request and provide a Unix account
+## in return. The Unix account must be composed of a Unix User ID and
+## Unix Group ID. Optionally Unix Secondary GIDs may be returned. All of
+## these IDs must be returned in numerical form. The results will then
+## be published in the LCMAPS framework.
+
+# scasclient       = "lcmaps_scas_client.mod"
+#                        " -capath /etc/grid-security/certificates/"
+#                        "--endpoint https://scas1.example.org:8443"
+#                        "--endpoint https://scas2.example.org:8443"
+#                        " -resourcetype wn"
+#                        " -actiontype execute-now"
+
+## 
+## The PEP client plugin
+##
+## This plug-in utilizes the PEP-C library to contact the PEP daemon. It
+## will send the user credentials and, if applicable, the pilot job
+## credentials and extra information to the PEP daemon.
+##
+## The PEP daemon will process the request and query the PDP, PAP, EES
+## chain for a policy decision. The PEP daemon will return a Permit
+## statement with a Unix account. The Unix account must be composed of a
+## Unix User ID and Unix Group ID. Optionally Unix Secondary GIDs may be
+## returned. All of these IDs must be returned in numerical form. The
+## results will then be published in the LCMAPS framework.
+##
+## The plug-in will use the credentials loaded in the LCMAPS framework
+## for the primary authorization decision. The returned Unix account
+## will reflect this identity. Additionally to this identity, in a
+## multi-user pilot job scenario, the X509_USER_PROXY environment
+## variable is read to add information about the identity that executes
+## the pilot job framework and triggered the execution of this plug-in.
+## This probably with the use of gLExec.
+
+pep_client       = "lcmaps_c_pep.mod"
+                       "--pep-daemon-endpoint-url https://{{ argus_server }}:{{ argus_port }}/authz"
+                       "--resourceid http://authz-interop.org/xacml/resource/resource-type/wn"
+                       "--actionid http://glite.org/xacml/action/execute"
+                       "--capath /etc/grid-security/certificates"
+                       "--pep-certificate-mode implicit"
+                       "--use-pilot-proxy-as-cafile" # Add this on RHEL 6 based systems
+
+
+## ======================================================================
+## Section: POLICIES
+## ======================================================================
+##
+## The policies are labeled, and gLExec will use the policy named in
+## glexec.conf(5); if no policy is declared the first one will be used.
+
+## One of the simplest policies is to verify the validity of the user
+## proxy, and mapping the DN to a local account in
+## /etc/grid-security/grid-mapfile.  This is the easiest setup to
+## handle just a few users.  The verify_proxy and localaccount
+## plug-ins in the plug-in section should be uncommented, and the
+## lcmaps-plugins-basic package must be installed.
+
+#localonly:
+#verify_proxy -> localaccount
+
+## If a site uses SCAS for centralized policy management, only the 
+## scas-client plugin is required.
+
+#scas:
+#scasclient -> good
+
+## If a site uses the ARGUS framework, only the PEP client plug-in
+## is needed.
+
+argus:
+pep_client -> good
+
+## If a site uses the ARGUS framework, and a batch system with tracking
+## GIDs, the following is a good policy
+
+#argus_tracking:
+#pep_client -> tracking_groupid
+
+## A VOMS based policy that first tries the VOMS attributes found in the
+## proxy (if any) to map to a local group, local account or poolaccount, and
+## if that fails falls back to using straight localaccount or poolaccount
+## mapping. This requires the lcmaps-plugins-basic and lcmaps-plugin-voms
+## packages in addition to uncommenting them in the plug-in section above.
+
+#vomspool:
+#verify_proxy -> vomslocalgroup
+#vomslocalgroup -> vomslocalaccount | localaccount
+#vomslocalaccount -> good | vomspoolaccount
+#localaccount -> good | poolaccount
+

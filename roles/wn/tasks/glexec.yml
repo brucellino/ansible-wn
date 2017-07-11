@@ -3,7 +3,7 @@
     name: glexec-wn
     state: latest
 
-- name: Add grid groups to white list
+- name: Configure glexec.conf
   template:
     src: templates/glexec.conf.j2
     dest: /etc/glexec.conf
@@ -11,5 +11,10 @@
     group: glexec
     mode: 0640
 
-- debug:
-    msg: "al loro que me desadherencio: {{ grid_groups.keys()|join(',') }}"
+- name: Configure glexec.conf
+  template:
+    src: templates/lcmaps-glexec.db.j2
+    dest: /etc/lcmaps/lcmaps-glexec.db
+    owner: root
+    group: root
+    mode: 0640
