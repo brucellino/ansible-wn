@@ -1,0 +1,15 @@
+- name: Install glexec package
+  package:
+    name: glexec-wn
+    state: latest
+
+- name: Add grid groups to white list
+  template:
+    src: templates/glexec.conf.j2
+    dest: /etc/glexec.conf
+    owner: root
+    group: glexec
+    mode: 0640
+
+- debug:
+    msg: "al loro que me desadherencio: {{ grid_groups.keys()|join(',') }}"

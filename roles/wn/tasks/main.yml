@@ -3,8 +3,6 @@
     name: wn
     state: latest
 
-- name: Install glexec package
-  package:
-    name: glexec-wn
-    state: latest
+- name: Deploy glexec
+  include: glexec.yml
   when: deploy_glexec
