@@ -5,3 +5,6 @@
 - src: https://github.com/egi-qc/ansible-grid-security
   version: master
   name: grid-security
+
+- src: grycap.munge
+  name: munge
