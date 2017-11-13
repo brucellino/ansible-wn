@@ -2,4 +2,3 @@
 dependencies:
   - { role: 'umd', crl_deploy: true }
   - { role: 'munge', slurm_deploy: true }
-  - { role: 'slurm', slurm_deploy: true }

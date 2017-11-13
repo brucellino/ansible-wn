@@ -8,6 +8,3 @@
 
 - src: grycap.munge
   name: munge
-
-- src: indigo-dc.slurm
-  name: slurm
