@@ -6,3 +6,6 @@
 - name: Deploy glexec
   include: glexec.yml
   when: deploy_glexec
+
+- include: slurm.yaml
+  when: deploy_slurm
